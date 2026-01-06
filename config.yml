@@ -1,0 +1,7 @@
+tunnel: 865a1e37-e9d3-406c-8557-921bc39e5a0b
+credentials-file: 865a1e37-e9d3-406c-8557-921bc39e5a0b.json
+
+ingress:
+  - hostname: scrapper.cosplay.co.id
+    service: http://localhost:5000
+  - service: http_status:404
