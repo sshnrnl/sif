@@ -383,9 +383,9 @@ def vanilla_get_links():
             SELECT *
             FROM links
             WHERE update_quota > 0
-              AND (updated_at < NOW() - INTERVAL 3 DAY OR update_quota = 3)
+              AND (updated_at < NOW() - INTERVAL 3 DAY OR update_quota = 10)
               AND link NOT IN (SELECT link FROM link_locks)
-            ORDER BY updated_at ASC
+            ORDER BY update_quota DESC
             LIMIT 5;
         """
 

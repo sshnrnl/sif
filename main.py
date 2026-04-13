@@ -12,6 +12,10 @@ def insert_links():
     result = vanilla_insert_links(links)
     return jsonify(result)
 
+@app.route("/", methods=["GET"])
+def main():
+    return "hi"
+
 @app.route("/get/post-links", methods=["POST"])
 def get_post_links():
     data = request.get_json()
@@ -61,4 +65,4 @@ def get_cogs():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, host="0.0.0.0")
+    app.run(debug=True, port=1000, host="0.0.0.0")
