@@ -2,12 +2,33 @@ from sif import *
 import asyncio
 import time 
 import random
+from datetime import datetime, timezone
 from TikTokApi import TikTokApi
 import instaloader
 from time import sleep
 
 
 # --- SCRAPER HELPERS ---
+
+def format_posted_date(value):
+    if not value:
+        return None
+
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            return value.strftime("%Y-%m-%d %H:%M:%S")
+        return value.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.isdigit():
+            return datetime.fromtimestamp(int(stripped), tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        return stripped
+
+    return str(value)
 
 def get_instagram_data(url):
     try:
@@ -26,16 +47,21 @@ def get_instagram_data(url):
             "comments": post.comments,
             "views": getattr(post, "video_view_count", None),
             "shares": 0,
+            "posted_date": format_posted_date(getattr(post, "date_utc", None) or getattr(post, "date", None)),
         }
     except Exception as e:
         print(f"[INSTAGRAM ERROR] {url} -> {e}")
-        return {"platform": "instagram", "link": url, "likes": "", "comments": "", "views": "", "shares": ""}
+        return {"platform": "instagram", "link": url, "likes": "", "comments": "", "views": "", "shares": "", "posted_date": ""}
 
 
 async def get_tiktok_data(url, api):
     try:
         video = api.video(url=url)
         video_data = await video.info()
+        posted_date = (
+            video_data.get("createTime")
+            or video_data.get("itemInfo", {}).get("itemStruct", {}).get("createTime")
+        )
         return {
             "platform": "tiktok",
             "link": url,
@@ -43,10 +69,11 @@ async def get_tiktok_data(url, api):
             "comments": video_data["stats"].get("commentCount"),
             "views": video_data["stats"].get("playCount"),
             "shares": video_data["stats"].get("shareCount"),
+            "posted_date": format_posted_date(posted_date),
         }
     except Exception as e:
         print(f"[TIKTOK ERROR] {url} -> {e}")
-        return {"platform": "tiktok", "link": url, "likes": "", "comments": "", "views": "", "shares": ""}
+        return {"platform": "tiktok", "link": url, "likes": "", "comments": "", "views": "", "shares": "", "posted_date": ""}
 
 
 # --- MAIN SCRAPER LOGIC ---
@@ -78,7 +105,7 @@ async def main():
                 data = await get_tiktok_data(url, api)
             else:
                 print(f"[SKIP] Unknown platform: {url}")
-                data = {"platform": "unknown", "link": url, "likes": "", "comments": "", "views": "", "shares": ""}
+                data = {"platform": "unknown", "link": url, "likes": "", "comments": "", "views": "", "shares": "", "posted_date": ""}
 
             results.append(data)
 

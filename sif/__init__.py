@@ -45,6 +45,7 @@ def metabase_insert_links(links: list[str]):
             comments INT DEFAULT 0,
             views INT DEFAULT 0,
             shares INT DEFAULT 0,
+            posted_date DATETIME NULL,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );
         INSERT IGNORE INTO links (link) VALUES {values};
@@ -247,9 +248,12 @@ def metabase_update_links(results: list[dict]):
         comments = r.get("comments") or 0
         views = r.get("views") or 0
         shares = r.get("shares") or 0
+        posted_date = r.get("posted_date")
+        posted_date_sql = f"'{posted_date}'" if posted_date else "NULL"
         query = f"""
             UPDATE links
             SET likes = {likes}, comments = {comments}, views = {views}, shares = {shares},
+                posted_date = {posted_date_sql},
                 updated_at = NOW(), update_quota = update_quota - 1
             WHERE link = '{link}';
         """
@@ -436,7 +440,7 @@ def vanilla_unlock_links(links: list[str]):
             conn.close()
 
 def vanilla_update_links(results: list[dict]):
-    """Update scraped metrics (likes, comments, views, shares) into the links table."""
+    """Update scraped metrics and posted date into the links table."""
     if not results:
         return {"status": "no_results"}
 
@@ -451,7 +455,8 @@ def vanilla_update_links(results: list[dict]):
 
     update_query = """
         UPDATE links
-        SET likes = %s, comments = %s, views = %s, shares = %s, updated_at = NOW(),update_quota = update_quota - 1
+        SET likes = %s, comments = %s, views = %s, shares = %s, posted_date = %s,
+            updated_at = NOW(),update_quota = update_quota - 1
         WHERE link = %s
     """
 
@@ -461,6 +466,7 @@ def vanilla_update_links(results: list[dict]):
             r.get("comments") or 0,
             r.get("views") or 0,
             r.get("shares") or 0,
+            r.get("posted_date") or None,
             r["link"],
         )
         for r in results
@@ -498,6 +504,7 @@ def vanilla_insert_links(links: list[str]):
             comments INT DEFAULT 0,
             views INT DEFAULT 0,
             shares INT DEFAULT 0,
+            posted_date DATETIME NULL,
             update_quota INT DEFAULT 3,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )

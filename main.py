@@ -30,7 +30,7 @@ def get_post_links():
             "comments": row.get("comments", 0),
             "views": row.get("views", 0),
             "shares": row.get("shares", 0),
-
+            "posted_date": row.get("posted_date"),
             "updated_at": row.get("updated_at", 0)
 
         }
