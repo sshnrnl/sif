@@ -10,6 +10,7 @@ requests>=2.31.0
 # Social Media Scrapers
 TikTokApi>=5.2.0
 instaloader>=4.10.0
+yt-dlp>=2025.3.31
 
 # Task Scheduling
 APScheduler>=3.10.0

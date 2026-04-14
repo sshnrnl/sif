@@ -1,10 +1,10 @@
 # SIF - Social Media Metrics Scraper
 
-A Python application that scrapes social media metrics (likes, comments, views, shares) from Instagram and TikTok posts, with a Flask API for managing links and retrieving data.
+A Python application that scrapes social media metrics (likes, comments, views, shares) from Instagram, TikTok, YouTube, and Facebook posts, with a Flask API for managing links and retrieving data.
 
 ## Features
 
-- Scrape Instagram and TikTok post metrics
+- Scrape Instagram, TikTok, YouTube, and Facebook post metrics
 - Store metrics in MySQL database
 - Flask REST API for link management
 - Support for both direct MySQL and Metabase API connections
@@ -95,10 +95,12 @@ POST /insert/links
 Content-Type: application/json
 
 {
-  "links": [
-    "https://www.instagram.com/p/ABC123/",
-    "https://www.tiktok.com/@user/video/123456"
-  ]
+    "links": [
+      "https://www.instagram.com/p/ABC123/",
+      "https://www.tiktok.com/@user/video/123456",
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "https://www.facebook.com/watch/?v=1234567890"
+    ]
 }
 ```
 
